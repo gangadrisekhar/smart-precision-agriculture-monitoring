@@ -1,0 +1,90 @@
+#include <lpc21xx.h>
+
+#include "header.h"
+
+
+/* PIR sensor connected to P0.18 */
+
+#define PIR_SENS   ((IOPIN0 >> 18) & 1)
+
+
+void PIR_sensor(void)
+
+{
+
+    if(PIR_SENS == 1)          // No motion
+
+    {
+
+        uart0_tx_string("Motion Status : CLEAR\r\n");
+
+        uart0_tx_string("Security : NORMAL\r\n");
+
+
+        /* Green LED ON */
+
+        IOCLR0 = green;
+
+        IOSET0 = yellow | red;
+
+
+        /* Buzzer OFF */
+
+        IOCLR0 = BUZZER;
+
+
+        lcd_cmd(0x01);
+
+        lcd_cmd(0x80);
+
+        lcd_string("Field : SAFE");
+
+
+        lcd_cmd(0xC0);
+
+        lcd_string("No Motion");
+
+    }
+
+    else                       // Motion detected
+
+    {
+
+        uart0_tx_string("Motion Status : DETECTED\r\n");
+
+        uart0_tx_string("Security : ALERT\r\n");
+
+
+        /* Yellow LED ON */
+
+        IOCLR0 = yellow;
+
+        IOSET0 = green | red;
+
+
+        /* Buzzer ON */
+
+        IOSET0 = BUZZER;
+
+
+        lcd_cmd(0x01);
+
+        lcd_cmd(0x80);
+
+        lcd_string("Motion Found");
+
+
+        lcd_cmd(0xC0);
+
+        lcd_string("Check Field");
+
+    }
+
+
+    uart0_tx_string("-----------------------------------\r\n");
+
+
+    delay_ms(100);
+
+}
+
